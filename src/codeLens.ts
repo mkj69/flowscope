@@ -3,7 +3,9 @@ import * as vscode from "vscode";
 export class FlowScopeCodeLensProvider implements vscode.CodeLensProvider {
   provideCodeLenses(document: vscode.TextDocument): vscode.CodeLens[] {
     const lenses: vscode.CodeLens[] = [];
-    const pattern = /^\s*(?:export\s+)?(?:default\s+)?(?:async\s+)?(?:function\s+[A-Za-z_$][\w$]*|class\s+[A-Za-z_$][\w$]*|(?:public\s+|private\s+|protected\s+|static\s+|async\s+)*(?:[A-Za-z_$][\w$]*\s*)?\([^)]*\)\s*(?::[^=<{]+)?\s*[{=])/;
+    const pattern = document.languageId === "python"
+      ? /^\s*(?:async\s+def|def|class)\s+[A-Za-z_]\w*/
+      : /^\s*(?:export\s+)?(?:default\s+)?(?:async\s+)?(?:function\s+[A-Za-z_$][\w$]*|class\s+[A-Za-z_$][\w$]*|(?:public\s+|private\s+|protected\s+|static\s+|async\s+)*(?:[A-Za-z_$][\w$]*\s*)?\([^)]*\)\s*(?::[^=<{]+)?\s*[{=])/;
     for (let line = 0; line < document.lineCount; line += 1) {
       const text = document.lineAt(line).text;
       if (!pattern.test(text)) continue;

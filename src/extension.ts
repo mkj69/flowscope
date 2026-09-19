@@ -5,15 +5,20 @@ import { FlowScopeCodeLensProvider } from "./codeLens";
 import { findRelatedTests } from "./testDiscovery";
 import { runTest } from "./testRunner";
 import { FlowPanel } from "./webview";
+import { analyzePythonSymbol } from "./pythonAnalyzer";
 
 const selector: vscode.DocumentSelector = [
   { language: "typescript", scheme: "file" },
   { language: "typescriptreact", scheme: "file" },
   { language: "javascript", scheme: "file" },
   { language: "javascriptreact", scheme: "file" },
+  { language: "python", scheme: "file" },
 ];
 
+let extensionRoot = "";
+
 export function activate(context: vscode.ExtensionContext): void {
+  extensionRoot = context.extensionPath;
   context.subscriptions.push(
     vscode.languages.registerCodeLensProvider(selector, new FlowScopeCodeLensProvider()),
     vscode.commands.registerCommand("flowscope.inspectSymbol", inspectSymbol),
@@ -42,12 +47,20 @@ async function inspectSymbol(uri?: vscode.Uri, position?: vscode.Position): Prom
   await vscode.window.withProgress({ location: vscode.ProgressLocation.Notification, title: "FlowScope is mapping the code flow…" }, async () => {
     try {
       const maxDepth = vscode.workspace.getConfiguration("flowscope").get<number>("maxCallDepth", 2);
-      const flow = analyzeSymbol({
-        fileName: document.uri.fsPath,
-        offset: document.offsetAt(cursor),
-        workspaceRoot: workspaceFolder.uri.fsPath,
-        maxDepth,
-      });
+      const flow = document.languageId === "python"
+        ? await analyzePythonSymbol({
+            fileName: document.uri.fsPath,
+            line: cursor.line,
+            workspaceRoot: workspaceFolder.uri.fsPath,
+            maxDepth,
+            pythonPath: vscode.workspace.getConfiguration("flowscope").get<string>("pythonPath", "python"),
+          }, extensionRoot)
+        : analyzeSymbol({
+            fileName: document.uri.fsPath,
+            offset: document.offsetAt(cursor),
+            workspaceRoot: workspaceFolder.uri.fsPath,
+            maxDepth,
+          });
       const tests = await findRelatedTests(workspaceFolder.uri.fsPath, flow.name);
       FlowPanel.show(flow, tests, workspaceFolder.uri.fsPath);
     } catch (error) {

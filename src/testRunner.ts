@@ -8,14 +8,15 @@ export function runTest(workspaceRoot: string, file: string): void {
   const quotedFile = quote(file);
   const command = custom
     ? custom.replaceAll("{file}", quotedFile)
-    : inferCommand(workspaceRoot, quotedFile);
+    : inferCommand(workspaceRoot, quotedFile, configuration.get<string>("pythonPath", "python"));
 
   const terminal = vscode.window.createTerminal({ name: "FlowScope Tests", cwd: workspaceRoot });
   terminal.show();
   terminal.sendText(command, true);
 }
 
-function inferCommand(root: string, quotedFile: string): string {
+function inferCommand(root: string, quotedFile: string, pythonPath: string): string {
+  if (fileExtension(quotedFile) === ".py") return `${quote(pythonPath)} -m pytest ${quotedFile}`;
   const packageJsonPath = path.join(root, "package.json");
   let packageJson: { dependencies?: Record<string, string>; devDependencies?: Record<string, string> } = {};
   if (fs.existsSync(packageJsonPath)) {
@@ -27,6 +28,10 @@ function inferCommand(root: string, quotedFile: string): string {
   if (fs.existsSync(path.join(root, "yarn.lock"))) return `yarn ${runner} ${quotedFile}`;
   if (runner === "npm test --") return `${runner} ${quotedFile}`;
   return `npx ${runner} ${quotedFile}`;
+}
+
+function fileExtension(quotedFile: string): string {
+  return path.extname(quotedFile.replace(/^"|"$/g, "")).toLowerCase();
 }
 
 function quote(value: string): string {

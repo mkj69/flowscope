@@ -6,3 +6,6 @@ tsconfig.json
 **/*.map
 **/*.test.js
 scripts/**
+python/test_*.py
+python/__pycache__/**
+**/*.pyc

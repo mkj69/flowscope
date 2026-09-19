@@ -2,7 +2,7 @@ import * as fs from "node:fs/promises";
 import * as path from "node:path";
 import { RelatedTest } from "./model";
 
-const testPattern = /\.(test|spec)\.(ts|tsx|js|jsx|mts|cts|mjs|cjs)$/;
+const testPattern = /(?:\.(test|spec)\.(ts|tsx|js|jsx|mts|cts|mjs|cjs)|(?:^test_.*|.*_test)\.py)$/;
 const ignored = new Set(["node_modules", ".git", "dist", "build", "out", "coverage"]);
 
 export async function findRelatedTests(root: string, symbolName: string, maxFiles = 1000): Promise<RelatedTest[]> {

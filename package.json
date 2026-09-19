@@ -1,8 +1,8 @@
 {
   "name": "flowscope",
   "displayName": "FlowScope",
-  "description": "Inspect function inputs, outputs, call flows, and related tests inside VS Code.",
-  "version": "0.1.0",
+  "description": "Inspect Python, TypeScript, and JavaScript function inputs, outputs, call flows, and related tests inside VS Code.",
+  "version": "0.2.0",
   "publisher": "local-dev",
   "repository": {
     "type": "git",
@@ -17,12 +17,14 @@
     "vscode": "^1.95.0"
   },
   "categories": ["Programming Languages", "Testing", "Visualization"],
+  "keywords": ["python", "pytest", "call graph", "code flow", "typescript"],
   "activationEvents": [
     "onCommand:flowscope.inspectSymbol",
     "onLanguage:typescript",
     "onLanguage:typescriptreact",
     "onLanguage:javascript",
-    "onLanguage:javascriptreact"
+    "onLanguage:javascriptreact",
+    "onLanguage:python"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -40,7 +42,7 @@
       "editor/context": [
         {
           "command": "flowscope.inspectSymbol",
-          "when": "editorLangId =~ /typescript|typescriptreact|javascript|javascriptreact/",
+          "when": "editorLangId =~ /typescript|typescriptreact|javascript|javascriptreact|python/",
           "group": "navigation@20"
         }
       ]
@@ -59,6 +61,11 @@
           "type": "string",
           "default": "",
           "description": "Optional test command template. Use {file} for the related test file path."
+        },
+        "flowscope.pythonPath": {
+          "type": "string",
+          "default": "python",
+          "description": "Python executable used for static AST analysis and pytest execution."
         }
       }
     }
