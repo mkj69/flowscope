@@ -1,0 +1,80 @@
+{
+  "name": "flowscope",
+  "displayName": "FlowScope",
+  "description": "Inspect function inputs, outputs, call flows, and related tests inside VS Code.",
+  "version": "0.1.0",
+  "publisher": "local-dev",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mkj69/flowscope.git"
+  },
+  "homepage": "https://github.com/mkj69/flowscope#readme",
+  "bugs": {
+    "url": "https://github.com/mkj69/flowscope/issues"
+  },
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.95.0"
+  },
+  "categories": ["Programming Languages", "Testing", "Visualization"],
+  "activationEvents": [
+    "onCommand:flowscope.inspectSymbol",
+    "onLanguage:typescript",
+    "onLanguage:typescriptreact",
+    "onLanguage:javascript",
+    "onLanguage:javascriptreact"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "flowscope.inspectSymbol",
+        "title": "FlowScope: Inspect Function Flow"
+      },
+      {
+        "command": "flowscope.runRelatedTest",
+        "title": "FlowScope: Run Related Test"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "flowscope.inspectSymbol",
+          "when": "editorLangId =~ /typescript|typescriptreact|javascript|javascriptreact/",
+          "group": "navigation@20"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "FlowScope",
+      "properties": {
+        "flowscope.maxCallDepth": {
+          "type": "number",
+          "default": 2,
+          "minimum": 1,
+          "maximum": 5,
+          "description": "Maximum outgoing call depth to display."
+        },
+        "flowscope.testCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Optional test command template. Use {file} for the related test file path."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p . && node scripts/vendor-typescript.mjs",
+    "watch": "tsc -w -p .",
+    "test": "npm run compile && node --test out/test/**/*.test.js",
+    "package": "vsce package --no-dependencies"
+  },
+  "dependencies": {
+    "typescript": "^5.9.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/vscode": "^1.95.0",
+    "@vscode/vsce": "^3.6.0"
+  }
+}

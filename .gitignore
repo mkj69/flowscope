@@ -1,0 +1,5 @@
+node_modules/
+out/
+vendor/typescript.js
+*.vsix
+.DS_Store
